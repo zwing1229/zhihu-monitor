@@ -1,0 +1,31 @@
+name: Zhihu Hot Monitor
+
+on:
+  schedule:
+    - cron: '0 * * * *'   # 每小时的第0分钟运行一次（整点）
+  workflow_dispatch:        # 允许你手动点击按钮测试
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write       # 允许自动保存去重记录
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run monitor
+        run: python monitor.py
+
+      - name: Commit sent items
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          file_pattern: sent_items.json
+          commit_message: "Update sent items"
